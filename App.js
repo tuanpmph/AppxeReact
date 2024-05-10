@@ -22,7 +22,7 @@ export default function App() {
         <Stack.Screen name='Main' component={Login} options={{headerShown: false}}/>
         <Stack.Screen name='Home' component={Home} />
         <Stack.Screen name='Dang Ky' component={Dangky}/>
-        <Stack.Screen name='Quen Mat Khau' component={Quenmk}/>
+        <Stack.Screen name='Quen Mat Khau 1' component={Quenmk}/>
         <Stack.Screen name='Thong Tin' component={Thongtin}/>
         <Stack.Screen name='Tung san pham' component={Tungsanpham}/>
       </Stack.Navigator>
