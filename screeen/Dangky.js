@@ -1,29 +1,75 @@
+import axios from "axios";
 import React from "react";
-import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { useState, useEffect } from "react";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert , Button} from "react-native";
 import { Icon } from "react-native-elements";
 
-const Dangky = (navigation)  => {
+const Dangky = ({navigation})  => {
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
-    const [passwordTwo, setPasswordTwo] = useState('');
+    // const [passwordTwo, setPasswordTwo] = useState('');
 
 
-    const handleHome = () => {
-        navigation.navigate('Main')
+    const handleDangky = async () => {
+
+
+        if (!name || !email || !phone || !password ) {
+            Alert.alert('Error', 'Vui lòng điền vào tất cả các trường!');
+            return;
+          }
+
+        // if(password !== setPasswordTwo){
+        //     Alert.alert('Error!' , 'Mat khau ko khop');
+        //     return;
+        // }
+        
+        console.log('Registering with:', {name, email, phone, password });
+
+
+        try {
+            const response = await axios.post('https://646f2b9709ff19b12086b863.mockapi.io/dangky', {
+              name: name,
+              email: email,
+              phone: phone,
+              password: password,
+            });
+            if (response.status === 201) {
+              Alert.alert('Success', 'Đăng ký thành công', [
+                { text: 'OK', onPress: () => navigation.navigate('Main') }
+              ]);
+            } else {
+              Alert.alert('Error', 'Đăng ký không thành công');
+            }
+          } catch (error) {
+            Alert.alert('Error', 'Đã xảy ra lỗi trong quá trình đăng ký');
+          }
     };
+    useEffect(() =>{
+        handleDangky();
+      } ,[]);
 
     return(
         <View style={styles.view}>
             <Image source={require('../image/anh copy.jpg')} style={styles.anh}/>
             <View style={styles.view2}>
+
+            <View style={styles.inputContainer}>
+                <Icon name="person" size={20} color="gray"/>
+                <TextInput style={styles.input}
+                   placeholder="Name"
+                   value={name}
+                   onChangeText={setName}
+                />
+            </View>
+
             <View style={styles.inputContainer}>
                 <Icon name="email" size={20} color="gray"/>
                 <TextInput style={styles.input}
                    placeholder="Email"
                    value={email}
-                   onChange={setEmail}
+                   onChangeText={setEmail}
                 />
             </View>
 
@@ -32,7 +78,7 @@ const Dangky = (navigation)  => {
                 <TextInput  style={styles.input}
                    placeholder="Phone"
                    value={phone}
-                   onChange={setPhone}
+                   onChangeText={setPhone}
                 />
             </View>
 
@@ -42,11 +88,11 @@ const Dangky = (navigation)  => {
                    placeholder="Password"
                    value={password}
                    secureTextEntry={true}
-                   onChange={setPassword}
+                   onChangeText={setPassword}
                 />
             </View>
 
-            <View style={styles.inputContainer}>
+            {/* <View style={styles.inputContainer}>
                 <Icon name="key" size={20} color="gray"/>
                 <TextInput  style={styles.input}
                    placeholder="Password"
@@ -54,11 +100,11 @@ const Dangky = (navigation)  => {
                    secureTextEntry={true}
                    onChange={setPasswordTwo}
                 />
-            </View>
+            </View> */}
             </View>
 
             <View>
-                <TouchableOpacity style={styles.bottom}>
+                <TouchableOpacity style={styles.bottom} onPress={handleDangky}>
                     <Text style={styles.bottomText}>Đăng Ký</Text>
                 </TouchableOpacity>
             </View>

@@ -1,16 +1,41 @@
-import React from 'react';
-import { View, Text, Image , StyleSheet} from 'react-native';
+import React, {useRef} from 'react';
+import { View, Text, Image , StyleSheet, ScrollView,Animated} from 'react-native';
 
 
 const Tungsanpham = ({ route }) => {
-  const { products } = route.params;
+  const { homeAPI } = route.params;
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+    {
+      useNativeDriver: true,
+      listener: (event) => {
+        console.log(event.nativeEvent.contentOffset.y); // Kiểm tra log để xác nhận giá trị scrollY
+      },
+    }
+  );
+  const opacity = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
 
   return (
     <View style={{ flex: 1, alignItems: 'center' }}>
-      <Image source={products.imageSource} style={styles.image} />
-      <Text style={{ fontSize: 24, fontWeight: 'bold', marginVertical: 10 }}>{products.name}</Text>
-      <Text style={styles.text}>{products.description}</Text>
-      <Text style={styles.text2}>{products.price}</Text>
+      <ScrollView  style={{ flex: 1 }}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}>
+        <Animated.View style={[styles.animatedView, { opacity }]}>
+          <Image source={{ uri: homeAPI.avatar }} style={styles.productImage} />
+          <Text style={styles.productName}>{homeAPI.name}</Text>
+          <Text style={styles.productPrice}>{homeAPI.price}$</Text>
+          <Text style={styles.productDescription}>{homeAPI.thongtin}</Text>
+        </Animated.View>
+      </ScrollView>
+      
+   
+            
     </View>
   );
 };
@@ -18,20 +43,40 @@ const Tungsanpham = ({ route }) => {
 export default Tungsanpham;
 
 const styles = StyleSheet.create({
-  image:{
-    marginTop:20,
-    width: 400,
-    height: 400,
-    borderRadius: 10
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#fff',
   },
-  text:{
-    width:380,
-    fontSize:20,
-
+  scrollView: {
+    flex: 1,
+    width: '100%',
   },
-  text2:{
-    marginTop: 60,
-    fontSize: 30,
-    color:'green'
-  }
+  animatedView: {
+    alignItems: 'center',
+  },
+  productImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  productName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    fontFamily: 'lato',  // Sử dụng font "Lato"
+  },
+  productPrice: {
+    fontSize: 18,
+    color: '#888',
+    marginBottom: 10,
+    fontFamily: 'lato',  // Sử dụng font "Lato"
+  },
+  productDescription: {
+    fontSize: 16,
+    textAlign: 'center',
+    paddingHorizontal: 20,
+    fontFamily: 'lato',  // Sử dụng font "Lato"
+  },
 });

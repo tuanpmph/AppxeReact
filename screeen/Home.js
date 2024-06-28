@@ -10,24 +10,22 @@ const Home = ({navigation})  => {
     
 
     const [currentPage, setCurrentPage] = useState(0);
+    const [home,setHome] = useState([]);
      const flatListRef = useRef(null);
+     
 
      const banners = [
-    { id: '1', imageSource: require('../image/anhto.jpg') },
+    { id: '1', imageSource: require('../image/anhto.jpg')},
     { id: '2', imageSource: require('../image/anhtoo.jpg') },
     { id: '3', imageSource: require('../image/anhtooo.jpg') },
     // Thêm các đối tượng hình ảnh khác nếu cần
      ];
 
-     const products = [
-        { id: '1', name: 'Product 1', price: '$19.99',description: 'Lamborghini Aventador SVJ là một kiệt tác đầy ấn tượng, thể hiện sức mạnh và tốc độ đỉnh cao. Được trang bị động cơ V12 6.5 lít, siêu xe này đạt công suất lên đến 770 mã lực, cho phép nó tăng tốc từ 0 đến 100 km/h chỉ trong 2,8 giây. ', imageSource: require('../image/anh copy.jpg') },
-        { id: '2', name: 'Product 2', price: '$29.99',description: 'Bugatti Chiron là một biểu tượng của sức mạnh và tốc độ vô song. Được trang bị động cơ W16 quad-turbocharged 8.0 lit, Chiron có công suất lên đến 1.500 mã lực và mô-men xoắn 1.600 Nm. Với hệ thống dẫn động 4 bánh toàn thời gian, Bugatti Chiron có khả năng tăng tốc từ 0 đến 100 km/h chỉ trong khoảng 2,5 giây.', imageSource: require('../image/anh copy.jpg') },
-        { id: '3', name: 'Product 3', price: '$39.99',description: 'Ferrari 488 GTB nổi bật với thiết kế động cơ mid-rear và hệ thống truyền động cỡ cánh cổ, mang lại trải nghiệm lái xe đầy hứng khởi và linh hoạt. Hệ thống lái đa hướng và hệ thống treo chủ động giúp cải thiện khả năng vận hành.', imageSource: require('../image/anh copy.jpg') },
-        { id: '4', name: 'Product 4', price: '$39.99',description: 'Siêu xe McLaren 720S là một trong những mô hình động cơ trung của hãng xe McLaren, nổi tiếng với hiệu suất cao và thiết kế động cơ mid-rear. Dưới đây là một số thông số kỹ thuật và đặc điểm của McLaren 720S:', imageSource: require('../image/anh copy.jpg') },
-        { id: '5', name: 'Product 5', price: '$39.99',description: 'Description 1', imageSource: require('../image/anh copy.jpg') },
-        { id: '6', name: 'Product 6', price: '$39.99',description: 'Description 1', imageSource: require('../image/anh copy.jpg') },
-        // Thêm các sản phẩm khác nếu cần
-      ];
+  
+
+    
+
+    
 
      useEffect(() => {
        const interval = setInterval(() => {
@@ -52,27 +50,38 @@ const Home = ({navigation})  => {
     const pageIndex = Math.round(contentOffset.x / Dimensions.get('window').width);
     setCurrentPage(pageIndex);
     };
+    
 
-    const renderItemm = ({ item }) => (
-        <TouchableOpacity style={styles.productContainer} onPress={() => tungsanpham(item)  }>
-          <Image source={item.imageSource} style={styles.productImage} />
-          <Text style={styles.productName}>{item.name}</Text>
-          <Text style={styles.productPrice}>{item.price}</Text>
-        </TouchableOpacity>
-      );
+    
 
     const thongtin = ()=>{
         navigation.navigate('Thong Tin')
     }
-    const tungsanpham = (products) =>{
-        navigation.navigate('Tung san pham', { products});
+    const tungsanpham = ( homeAPI ) =>{
+        navigation.navigate('Tung san pham', { homeAPI });
+    }
+
+
+
+    useEffect(() =>{
+      homeAPI();
+    },[]);
+
+    const homeAPI = async () =>{
+     try{
+      const response = await fetch('https://646f2b9709ff19b12086b863.mockapi.io/home');
+      const data = await response.json();
+      setHome(data)
+     }catch(error){
+      console.log(error);
+     }
     }
 
 
 
 
   return (
-   <ScrollView style={{backgroundColor:'#fff'}}>
+   <ScrollView style={{backgroundColor:'#fff', marginLeft:0}}>
      <View style={styles.View}>
        
         <View style={{marginTop:10, marginLeft:10}}>
@@ -91,8 +100,28 @@ const Home = ({navigation})  => {
     </View>
     </View>
 
+    <View style={styles.banner2}>
+                    <FlatList
+                        horizontal
+                        pagingEnabled
+                        showsHorizontalScrollIndicator={false}
+                        data={home}
+                        renderItem={({item}) => 
+                          <View style={styles.producviewchay2}>
+                        <TouchableOpacity style={styles.productContainer2} onPress={() => tungsanpham(item)  }>
+                          <Image source={{uri:item.avatar}} style={styles.productImage2} />
+                          <Text style={styles.productName2}>{item.name}</Text>
+                          <Text style={styles.productPrice2}>{item.price}$</Text>
+                        </TouchableOpacity>
+                      </View>}
+            
+                        keyExtractor={(item) => item.id}
+                    />
+                </View>
+
     <View style={styles.banner}>
         <FlatList
+        scrollEnabled={false}
          ref={flatListRef}
          data={banners}
          renderItem={renderItem}
@@ -110,11 +139,20 @@ const Home = ({navigation})  => {
 
   <View style={styles.container}>
       <FlatList
-        data={products}
-        renderItem={renderItemm}
+       scrollEnabled={false}
+        data={home} //// đây nhé dât day nhé
+        renderItem={({item})=>
+        <View>
+          <TouchableOpacity style={styles.productContainer} onPress={() => tungsanpham(item)  }>
+            <Image source={{uri:item.avatar}} style={styles.productImage} />
+            <Text style={styles.productName}>{item.name}</Text>
+            <Text style={styles.productPrice}>{item.price}$</Text>
+          </TouchableOpacity>
+        </View>}
         keyExtractor={(item) => item.id}
         numColumns={2} // Hiển thị 2 cột
         columnWrapperStyle={styles.row} // Cấu hình style cho từng dòng
+    
       />
     </View>
    </ScrollView>
@@ -149,16 +187,11 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 70,
         borderBottomRightRadius: 70,
     },
-    banner:{backgroundColor:'#fff',
-        marginTop:10,
-       marginLeft:6,
-       width:400,
-       height:250,
-    },
+   
     bannerImage:{
         resizeMode:'cover',
         height:250,
-        width:400,
+        width:415,
         borderTopRightRadius: 10,
         borderTopLeftRadius: 10,
         borderBottomLeftRadius: 10,
@@ -188,13 +221,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
       },
       productImage: {
-        width: 170,
+        width: 140,
         height: 160,
         borderRadius: 10,
         marginBottom: 10,
       },
       productName: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: 'bold',
         marginBottom: 5,
       },
@@ -202,6 +235,58 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#888',
       },
+      banner: {
+        backgroundColor: '#fff',
+        marginTop: 1,
+        marginLeft: 5,
+        marginRight:5,
+        width: Dimensions.get('window').width,
+        height: 250,
+    },
+    banner2: {
+      backgroundColor: '#fff',
+      marginTop: -10,
+      marginLeft: 0,
+      height:200,
+  },
+  productContainer2: {
+    alignItems:'center',
+    flex: 1,
+    width:100,
+    height: 80,
+    margin: 3,
+    backgroundColor: '#FFDADA',
+    borderRadius: 10,
+    padding: 6,
+    alignItems: 'center',
+  },
+  productImage2: {
+    width: 90,
+    height: 110,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  productName2: {
+    alignItems:'center',
+    width:80,
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    textAlign:'center'
+  },
+  productPrice2: {
+    borderRadius:5,
+    backgroundColor:'red',
+    fontSize: 12,
+    width:85,
+    color: '#fff',
+    
+    textAlign:'center'
+  },
+  producviewchay2:{
+    backgroundColor: '#fff'
+
+  }
 
     
    

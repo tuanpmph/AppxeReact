@@ -1,16 +1,44 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput,TouchableOpacity,Image, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput,TouchableOpacity,Image, StyleSheet, Alert } from 'react-native';
 import { Input, Icon } from "react-native-elements";
-import { BackgroundImage } from 'react-native-elements/dist/config';
+import axios from "axios";
+
+
+const API_URL = "https://646f2b9709ff19b12086b863.mockapi.io/dangky";
 
 
 const Login  = ({navigation}) =>{
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = () =>{
-        navigation.navigate('Home')
-    } ;
+    // Tạo biến users để lưu trữ danh sách user của hệ thống
+
+
+    // Function lấy dữ liệu từ API sử dụng fetch
+    const handleLogin = async () =>{
+      try {
+        const response = await axios.get(API_URL);
+        const users = response.data;
+        const user = users.find(user => user.email === email && user.password === password);
+       
+        if (user && user.email && user.password) {
+          console.log('Login successful:', user);
+          Alert.alert('Đăng nhập thành công');
+          navigation.navigate('Home')
+        } else {
+          console.log('Login failed: Invalid username or password');
+          Alert.alert('Đăng nhập không thành công: Tên đăng nhập hoặc mật khẩu không hợp lệ');
+        }
+      } catch (error) {
+        console.error('Login failed:', error);
+        Alert.alert('Đăng nhập không thành công');
+      }
+    }
+
+    useEffect(() =>{
+      handleLogin();
+    } ,[]);
+    
 
     const dangky = () =>{
         navigation.navigate('Dang Ky')
@@ -31,7 +59,7 @@ const Login  = ({navigation}) =>{
             <TextInput style={styles.input}
             placeholder="Email"
             value={email}
-            onChangeText={setEmail}
+            onChangeText= {text => setEmail(text)}
             />
         </View>
         <View style={styles.inputContainer}>
@@ -40,7 +68,7 @@ const Login  = ({navigation}) =>{
         placeholder="Mật khẩu"
         secureTextEntry={true}
         value={password}
-        onChangeText={setPassword}
+        onChangeText= {text => setPassword(text)}
        />
         </View>
        </View>
@@ -48,10 +76,16 @@ const Login  = ({navigation}) =>{
        <TouchableOpacity style={styles.buton} onPress={handleLogin}>
           <Text style={styles.bottomText}>Đăng Nhập</Text>
         </TouchableOpacity>
+
+
+
         <View style={styles.dangky}>
         <TouchableOpacity style={styles.chu} onPress={dangky}>
           <Text style={styles.bottomText}>Đăng Ký</Text>
         </TouchableOpacity>
+
+
+
         <TouchableOpacity style={styles.chu} onPress={quenmk}>
           <Text style={styles.bottomText}> | Quyên Mật Khẩu</Text>
         </TouchableOpacity>
